@@ -24,6 +24,3 @@ env/
 dist/
 build/
 *.egg-info/
-
-# Template files (removed after setup)
-setup.sh
