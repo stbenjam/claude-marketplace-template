@@ -411,6 +411,59 @@
             color: var(--text-muted);
         }
 
+        .hook-item {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-code);
+            border-radius: 8px;
+            border-left: 3px solid var(--success);
+        }
+
+        .hook-name {
+            font-size: 0.95rem;
+            color: var(--success);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .hook-id {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .hook-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .agent-item {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-code);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .agent-name {
+            font-size: 0.95rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .agent-id {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
 
         .installation {
             background: var(--bg-card);
@@ -711,6 +764,14 @@
                         <div class="stat-value" id="skill-count">0</div>
                         <div class="stat-label">Skills</div>
                     </div>
+                    <div class="stat">
+                        <div class="stat-value" id="hook-count">0</div>
+                        <div class="stat-label">Hooks</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="agent-count">0</div>
+                        <div class="stat-label">Agents</div>
+                    </div>
                 </div>
             </div>
             <div class="navbar-links">
@@ -740,7 +801,7 @@
         </div>
 
         <footer>
-            <p>Built with Claude Code | <a href="https://github.com/{{GITHUB_REPO}}" style="color: var(--primary);">{{GITHUB_REPO}}</a></p>
+            <p>Built with <a href="https://github.com/stbenjam/claude-marketplace-template" style="color: var(--primary);">Claude Marketplace Template</a> | <a href="https://github.com/{{GITHUB_REPO}}" style="color: var(--primary);">{{GITHUB_REPO}}</a></p>
         </footer>
     </div>
 
@@ -771,6 +832,10 @@
                 document.getElementById('command-count').textContent = totalCommands;
                 const totalSkills = data.plugins.reduce((sum, p) => sum + (p.skills || []).length, 0);
                 document.getElementById('skill-count').textContent = totalSkills;
+                const totalHooks = data.plugins.reduce((sum, p) => sum + (p.hooks || []).length, 0);
+                document.getElementById('hook-count').textContent = totalHooks;
+                const totalAgents = data.plugins.reduce((sum, p) => sum + (p.agents || []).length, 0);
+                document.getElementById('agent-count').textContent = totalAgents;
 
                 renderPlugins(allPlugins);
 
@@ -795,8 +860,12 @@
 
             grid.innerHTML = plugins.map(plugin => {
                 const skills = plugin.skills || [];
+                const hooks = plugin.hooks || [];
+                const agents = plugin.agents || [];
                 const commandCount = plugin.commands.length;
                 const skillCount = skills.length;
+                const hookCount = hooks.length;
+                const agentCount = agents.length;
 
                 return `
                 <div class="plugin-card" data-plugin="${plugin.name}" onclick="showPluginModal('${plugin.name}')">
@@ -820,6 +889,18 @@
                             <span>skill${skillCount !== 1 ? 's' : ''}</span>
                         </div>
                         ` : ''}
+                        ${hookCount > 0 ? `
+                        <div class="item-count">
+                            <span class="item-count-badge">${hookCount}</span>
+                            <span>hook${hookCount !== 1 ? 's' : ''}</span>
+                        </div>
+                        ` : ''}
+                        ${agentCount > 0 ? `
+                        <div class="item-count">
+                            <span class="item-count-badge">${agentCount}</span>
+                            <span>agent${agentCount !== 1 ? 's' : ''}</span>
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
             `;
@@ -831,8 +912,12 @@
             if (!plugin) return;
 
             const skills = plugin.skills || [];
+            const hooks = plugin.hooks || [];
+            const agents = plugin.agents || [];
             const commandCount = plugin.commands.length;
             const skillCount = skills.length;
+            const hookCount = hooks.length;
+            const agentCount = agents.length;
 
             // Build header with title, metadata, and version
             const headerContent = `
@@ -849,6 +934,18 @@
                         <div class="item-count">
                             <span class="item-count-badge">${skillCount}</span>
                             <span>skill${skillCount !== 1 ? 's' : ''}</span>
+                        </div>
+                        ` : ''}
+                        ${hookCount > 0 ? `
+                        <div class="item-count">
+                            <span class="item-count-badge">${hookCount}</span>
+                            <span>hook${hookCount !== 1 ? 's' : ''}</span>
+                        </div>
+                        ` : ''}
+                        ${agentCount > 0 ? `
+                        <div class="item-count">
+                            <span class="item-count-badge">${agentCount}</span>
+                            <span>agent${agentCount !== 1 ? 's' : ''}</span>
                         </div>
                         ` : ''}
                     </div>
@@ -911,6 +1008,41 @@
                             ${skill.description ? `<div class="skill-description">${skill.description}</div>` : ''}
                         </div>
                     `).join('')}
+                `;
+            }
+
+            if (hookCount > 0) {
+                content += `
+                    <div class="section-title">Hooks</div>
+                    ${hooks.map(hook => `
+                        <div class="hook-item">
+                            <div class="hook-name">${hook.name}</div>
+                            <div class="hook-id">${hook.event}</div>
+                            ${hook.description ? `<div class="hook-description">${hook.description}</div>` : ''}
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            if (agentCount > 0) {
+                content += `
+                    <div class="section-title">Agents</div>
+                    ${agents.map(agent => `
+                        <div class="agent-item">
+                            <div class="agent-name">${agent.name}</div>
+                            <div class="agent-id">${plugin.name}:${agent.id}</div>
+                            ${agent.description ? `<div class="agent-description">${agent.description}</div>` : ''}
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            if (plugin.has_mcp) {
+                content += `
+                    <div class="section-title">MCP Configuration</div>
+                    <div class="command-item">
+                        <div class="command-description">This plugin includes MCP (Model Context Protocol) server configuration</div>
+                    </div>
                 `;
             }
 
