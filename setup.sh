@@ -110,8 +110,8 @@ cat > .template-config.json << EOF
 }
 EOF
 
-# Rename marketplace.json.template to marketplace.json
-mv .claude-plugin/marketplace.json.template .claude-plugin/marketplace.json
+# Create marketplace.json from template (overwrite if exists)
+cp .claude-plugin/marketplace.json.template .claude-plugin/marketplace.json
 
 echo "✓ Configuration created"
 
