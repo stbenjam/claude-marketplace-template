@@ -35,10 +35,13 @@ The setup script will ask you for:
 ### 3. Enable GitHub Pages
 
 1. Go to your repository Settings → Pages
-2. Set Source to "GitHub Actions"
-3. Push to main branch to trigger deployment
+2. Set Source to "Deploy from a branch"
+3. Select branch: `main` and folder: `/docs`
+4. Click Save
 
 Your docs will be available at: `https://your-username.github.io/your-marketplace/`
+
+After making changes to your plugins, run `make update` to regenerate the docs, then commit and push.
 
 ## Usage
 
@@ -93,10 +96,10 @@ your-marketplace/
 │   ├── marketplace.json       # Marketplace metadata
 │   └── settings.json          # Installed plugins
 ├── .github/workflows/
-│   └── deploy-docs.yml        # Auto-deploy to GitHub Pages
+│   └── lint.yml               # Lint plugins on push/PR
 ├── .template-config.json      # Your branding configuration
 ├── docs/
-│   ├── index.html            # Documentation site
+│   ├── index.html            # Documentation site (static)
 │   ├── data.json             # Generated plugin data
 │   └── .nojekyll             # Disable Jekyll processing
 ├── plugins/
