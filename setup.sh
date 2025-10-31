@@ -113,12 +113,20 @@ EOF
 # Create marketplace.json from template (overwrite if exists)
 cp .claude-plugin/marketplace.json.template .claude-plugin/marketplace.json
 
+# Create README.md from template (overwrite if exists)
+cp README.md.template README.md
+
 echo "✓ Configuration created"
 
 # Apply branding
 echo ""
 echo "🎨 Applying branding..."
 python3 scripts/apply-branding.py
+
+# Generate documentation
+echo ""
+echo "📚 Generating documentation..."
+make update
 
 # Remove example plugin if requested
 if [[ "$KEEP_EXAMPLE" != "y" && "$KEEP_EXAMPLE" != "Y" ]]; then

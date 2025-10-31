@@ -75,6 +75,14 @@ def apply_to_file(file_path, replacements):
 def main():
     config = load_config()
 
+    # Extract owner and repo name from github_repo
+    github_repo = config["github_repo"]
+    if "/" in github_repo:
+        owner, repo = github_repo.split("/", 1)
+        github_pages_url = f"{owner}.github.io/{repo}"
+    else:
+        github_pages_url = f"{github_repo}.github.io"
+
     # Build replacements dict
     replacements = {
         "MARKETPLACE_NAME": config["marketplace_name"],
@@ -82,6 +90,7 @@ def main():
         "MARKETPLACE_SUBTITLE": f"Claude Code Plugins by {config['owner_name']}",
         "OWNER_NAME": config["owner_name"],
         "GITHUB_REPO": config["github_repo"],
+        "GITHUB_PAGES_URL": github_pages_url,
         "PRIMARY_COLOR": config["color_scheme"]["primary"],
         "PRIMARY_DARK": config["color_scheme"]["primary_dark"],
         "SECONDARY_COLOR": config["color_scheme"]["secondary"],
@@ -92,6 +101,7 @@ def main():
         "docs/index.html",
         ".claude-plugin/marketplace.json",
         "plugins/example-plugin/.claude-plugin/plugin.json",
+        "README.md",
     ]
 
     for file_path in files_to_update:

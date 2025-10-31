@@ -87,6 +87,60 @@ def get_plugin_skills(plugin_path: Path) -> List[Dict[str, str]]:
 
     return skills
 
+def get_plugin_hooks(plugin_path: Path) -> List[Dict[str, str]]:
+    """Get all hooks for a plugin"""
+    hooks = []
+    hooks_dir = plugin_path / "hooks"
+
+    if not hooks_dir.exists():
+        return hooks
+
+    for hook_file in sorted(hooks_dir.glob("*.md")):
+        try:
+            content = hook_file.read_text()
+            frontmatter = parse_frontmatter(content)
+
+            hook_name = hook_file.stem
+            hooks.append({
+                "name": frontmatter.get("name", hook_name),
+                "event": frontmatter.get("event", hook_name),
+                "description": frontmatter.get("description", "")
+            })
+        except Exception as e:
+            print(f"Error processing {hook_file}: {e}")
+
+    return hooks
+
+def get_plugin_agents(plugin_path: Path) -> List[Dict[str, str]]:
+    """Get all agents for a plugin"""
+    agents = []
+    agents_dir = plugin_path / "agents"
+
+    if not agents_dir.exists():
+        return agents
+
+    for agent_file in sorted(agents_dir.glob("*.md")):
+        try:
+            content = agent_file.read_text()
+            frontmatter = parse_frontmatter(content)
+
+            agent_id = agent_file.stem
+            agents.append({
+                "name": frontmatter.get("name", agent_id),
+                "id": agent_id,
+                "description": frontmatter.get("description", ""),
+                "subagent_type": frontmatter.get("subagent_type", agent_id)
+            })
+        except Exception as e:
+            print(f"Error processing {agent_file}: {e}")
+
+    return agents
+
+def has_mcp_config(plugin_path: Path) -> bool:
+    """Check if plugin has MCP configuration"""
+    mcp_file = plugin_path / ".mcp.json"
+    return mcp_file.exists()
+
 def build_website_data():
     """Build complete website data structure"""
     # Get repository root (parent of scripts directory)
@@ -112,9 +166,11 @@ def build_website_data():
             with open(plugin_json_path) as f:
                 plugin_metadata = json.load(f)
 
-        # Get commands and skills
+        # Get commands, skills, hooks, and agents
         commands = get_plugin_commands(plugin_path)
         skills = get_plugin_skills(plugin_path)
+        hooks = get_plugin_hooks(plugin_path)
+        agents = get_plugin_agents(plugin_path)
 
         # Read README if exists
         readme_path = plugin_path / "README.md"
@@ -128,7 +184,10 @@ def build_website_data():
             "version": plugin_metadata.get("version", "unknown"),
             "commands": commands,
             "skills": skills,
-            "has_readme": readme_path.exists()
+            "hooks": hooks,
+            "agents": agents,
+            "has_readme": readme_path.exists(),
+            "has_mcp": has_mcp_config(plugin_path)
         }
 
         website_data["plugins"].append(plugin_data)
@@ -151,3 +210,7 @@ if __name__ == "__main__":
     print(f"Total commands: {total_commands}")
     total_skills = sum(len(p['skills']) for p in data['plugins'])
     print(f"Total skills: {total_skills}")
+    total_hooks = sum(len(p['hooks']) for p in data['plugins'])
+    print(f"Total hooks: {total_hooks}")
+    total_agents = sum(len(p['agents']) for p in data['plugins'])
+    print(f"Total agents: {total_agents}")
